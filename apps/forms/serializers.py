@@ -53,3 +53,25 @@ class WheelSpecificationResponseSerializer(serializers.ModelSerializer):
     class Meta: 
         model = WheelSpecification
         fields = ['formNumber', 'submittedBy', 'submittedDate', 'status']
+
+
+class WheelSpecificationListViewSerializer(serializers.ModelSerializer):
+    """Serializer for listing wheel specifications with filtering options."""
+    formNumber = serializers.CharField(source='form_number')
+    submittedBy = serializers.CharField(source='submitted_by')
+    submittedDate = serializers.DateField(source='submitted_date')
+    wheelFields = serializers.SerializerMethodField()
+    status = serializers.CharField()
+
+    class Meta:
+        model = WheelSpecification
+        fields = ['formNumber', 'submittedBy', 'submittedDate', 'wheelFields', 'status']
+
+    def get_wheelFields(self, obj):
+        """Get wheel specification fields"""
+        return {
+            "condemningDia": obj.condemning_dia,
+            "lastShopIssueSize": obj.last_shop_issue_size,
+            "treadDiameterNew": obj.tread_diameter_new,
+            "wheelGauge": obj.wheel_gauge,
+        }

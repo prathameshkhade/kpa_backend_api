@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import (WheelSpecificationCreateView)
+from .views import WheelSpecificationListCreateView
 
 app_name = 'forms'
 
 urlpatterns = [
-    path('wheel-specifications/', WheelSpecificationCreateView.as_view(), name='wheel-specification-create'),
+    path('wheel-specifications/', WheelSpecificationListCreateView.as_view(), name='wheel-specification'),
 ]
