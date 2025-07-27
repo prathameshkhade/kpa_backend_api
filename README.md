@@ -276,20 +276,33 @@ kpa_backend/
 ├── .env.example
 ├── .gitignore
 ├── README.md
+|
 ├── kpa_backend/              # Main project settings
 │   ├── __init__.py
 │   ├── settings.py
 │   ├── urls.py
 │   └── wsgi.py
-└── apps/
-    └── forms/                # Forms management app
-        ├── __init__.py
-        ├── models.py         # WheelSpecification model
-        ├── serializers.py    # DRF serializers
-        ├── views.py          # API views
-        ├── urls.py           # URL routing
-        ├── admin.py          # Django admin
-        └── migrations/       # Database migrations
+|
+├── apps/                       # Applications directory
+│   ├── __init__.py
+│   └── forms/                # Forms management app
+|   |   ├── __init__.py
+|   |   ├── models.py         # WheelSpecification model
+|   |   ├── serializers.py    # DRF serializers
+|   |   ├── views.py          # API views
+|   |   ├── urls.py           # URL routing
+|   |   ├── admin.py          # Django admin
+|   |   └── migrations/       # Database migrations
+│   │
+│   └── common/               # Common utilities
+│       ├── __init__.py
+│       ├── models.py         # Abstract base models
+│       ├── serializers.py    # Common serializers
+│       ├── permissions.py    # Custom permissions
+│       └── utils.py          # Utility functions
+│
+└── static/                   # Static files
+    └── media/                # Media files
 ```
 
 ## 🔒 Security Features
