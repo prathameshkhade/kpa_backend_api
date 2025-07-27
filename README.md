@@ -1,247 +1,239 @@
-# KPA API - Form Data Management System
+# KPA Backend - Wheel Specifications Management API
 
-A Django REST Framework API for managing KPA form data including wheel specifications and bogie checksheets.
+A Django REST Framework API for managing KPA wheel specification forms with filtering capabilities and comprehensive documentation.
 
 ## 🚀 Tech Stack
 
 - **Backend Framework**: Django 4.2 + Django REST Framework
 - **Database**: PostgreSQL 15
-- **Dependency Management**: UV (ultra-fast Python package installer)
-- **Containerization**: Docker with multi-stage builds
 - **API Documentation**: Swagger/OpenAPI (drf-spectacular)
 - **Environment Management**: python-dotenv
-- **Image**: Alpine Linux (minimal size)
+- **Containerization**: Docker with custom Dockerfile
+- **Filtering**: django-filter for advanced query filtering
 
 ## 📋 Implemented APIs
 
-### 1. Wheel Specifications API
+### Wheel Specifications API
 
 **POST** `/api/forms/wheel-specifications/`
 - Create new wheel specification forms
 - Validates form number format (must start with 'WHEEL-')
 - Stores technical specifications and metadata
+- Returns structured success/error responses
 
 **GET** `/api/forms/wheel-specifications/`
 - Retrieve wheel specifications with filtering
-- Supports filtering by: formNumber, submittedBy, submittedDate
-- Returns paginated results
-
-### 2. Bogie Checksheet API (Bonus)
-
-**POST** `/api/forms/bogie-checksheet/`
-- Create bogie inspection checksheets
-- Handles nested bogie details and checksheet data
-- Validates form number format (must start with 'BOGIE-')
+- Supports filtering by: `formNumber`, `submittedBy`, `submittedDate`
+- Returns paginated results with structured response format
 
 ## 🛠️ Setup Instructions
 
 ### Prerequisites
-- Python 3.11+
+- Python 3.12+
 - PostgreSQL 15+
-- Docker & Docker Compose (optional)
-- UV package manager
+- Docker (optional, for containerized deployment)
 
 ### Local Development Setup
 
 1. **Clone the repository**
    ```bash
    git clone <your-repo-url>
-   cd kpa-api
+   cd kpa_backend
    ```
 
-2. **Install UV** (if not already installed)
+2. **Create and activate virtual environment**
    ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
-
-3. **Create virtual environment and install dependencies**
-   ```bash
-   uv venv
+   python -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   uv sync
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
    ```
 
 4. **Environment Configuration**
    ```bash
    cp .env.example .env
-   # Edit .env with your database credentials
    ```
+   
+   **⚠️ Important**: Edit the `.env` file with your actual configuration values:
+   ```env
+   SECRET_KEY=your-secret-key-here  # Generate a new Django secret key
+   DEBUG=True
+   DB_NAME=kpa_db
+   DB_USER=postgres
+   DB_PASSWORD=your-actual-password  # Use your PostgreSQL password
+   DB_HOST=localhost
+   DB_PORT=5432
+   ALLOWED_HOSTS=localhost,127.0.0.1
+   ```
+   
+   **🔐 Security Note**: Never commit your `.env` file to version control. It contains sensitive information.
 
 5. **Database Setup**
    ```bash
    # Create PostgreSQL database
    createdb kpa_db
    
-   # Run migrations
+   # Or using PostgreSQL command line:
+   psql -U postgres
+   CREATE DATABASE kpa_db;
+   \q
+   ```
+
+6. **Run Django migrations**
+   ```bash
    python manage.py makemigrations
    python manage.py migrate
-   
-   # Create superuser
+   ```
+
+7. **Create superuser (optional)**
+   ```bash
    python manage.py createsuperuser
    ```
 
-6. **Run Development Server**
+8. **Run development server**
    ```bash
    python manage.py runserver
    ```
 
+   The API will be available at: `http://localhost:8000`
+
 ### Docker Setup
 
-1. **Build and run with Docker Compose**
+1. **Build Docker image**
    ```bash
-   docker-compose up --build
+   docker build -t kpa-backend .
    ```
 
-2. **Run migrations in container**
+2. **Set up PostgreSQL database**
+   
+   **Option A: Using local PostgreSQL**
+   - Ensure PostgreSQL is running on your host machine
+   - Create database as shown in local setup
+   
+   **Option B: Using Docker PostgreSQL**
    ```bash
-   docker-compose exec web python manage.py migrate
-   docker-compose exec web python manage.py createsuperuser
+   # Run PostgreSQL container
+   docker run --name kpa-postgres -d \
+     -e POSTGRES_DB=kpa_db \
+     -e POSTGRES_USER=postgres \
+     -e POSTGRES_PASSWORD=your-password \
+     -p 5432:5432 \
+     postgres:15-alpine
    ```
+
+3. **Create environment file for Docker**
+   ```bash
+   # Create .env.docker
+   SECRET_KEY=your-secret-key-here
+   DEBUG=False
+   DB_NAME=kpa_db
+   DB_USER=postgres
+   DB_PASSWORD=your-password
+   DB_HOST=host.docker.internal  # For local PostgreSQL
+   # DB_HOST=kpa-postgres        # If using Docker PostgreSQL
+   DB_PORT=5432
+   ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+   ```
+
+4. **Run Django application container**
+   ```bash
+   # For local PostgreSQL
+   docker run -d --name kpa-backend \
+     -p 8000:8000 \
+     --env-file .env.docker \
+     kpa-backend
+   
+   # For Docker PostgreSQL (link containers)
+   docker run -d --name kpa-backend \
+     -p 8000:8000 \
+     --env-file .env.docker \
+     --link kpa-postgres:postgres \
+     kpa-backend
+   ```
+
+5. **Run migrations in container**
+   ```bash
+   docker exec kpa-backend python manage.py migrate
+   ```
+
+6. **Create superuser in container (optional)**
+   ```bash
+   docker exec -it kpa-backend python manage.py createsuperuser
+   ```
+
+### Docker Network Setup (Recommended)
+
+For better container communication, use Docker networks:
+
+```bash
+# Create network
+docker network create kpa-network
+
+# Run PostgreSQL
+docker run --name kpa-postgres -d \
+  --network kpa-network \
+  -e POSTGRES_DB=kpa_db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=your-password \
+  -p 5432:5432 \
+  postgres:15-alpine
+
+# Update .env.docker with:
+# DB_HOST=kpa-postgres
+
+# Run Django app
+docker run -d --name kpa-backend \
+  --network kpa-network \
+  -p 8000:8000 \
+  --env-file .env.docker \
+  kpa-backend
+```
 
 ## 📚 API Documentation
+
+Access comprehensive API documentation:
 
 - **Swagger UI**: http://localhost:8000/api/docs/
 - **ReDoc**: http://localhost:8000/api/redoc/
 - **OpenAPI Schema**: http://localhost:8000/api/schema/
+- **Health Check**: http://localhost:8000/health/
 
-## 🧪 Testing with Postman
+## 🧪 API Testing
 
-Import the provided Postman collection and test the following endpoints:
+### Create Wheel Specification
 
-### Wheel Specifications
-
-**Create Wheel Specification:**
-```json
-POST /api/forms/wheel-specifications/
-Content-Type: application/json
-
-{
-  "formNumber": "WHEEL-2025-001",
-  "submittedBy": "user_id_123",
-  "submittedDate": "2025-07-03",
-  "fields": {
-    "treadDiameterNew": "915 (900-1000)",
-    "lastShopIssueSize": "837 (800-900)",
-    "condemningDia": "825 (800-900)",
-    "wheelGauge": "1600 (+2,-1)",
-    "variationSameAxle": "0.5",
-    "variationSameBogie": "5",
-    "variationSameCoach": "13",
-    "wheelProfile": "29.4 Flange Thickness",
-    "intermediateWWP": "20 TO 28",
-    "bearingSeatDiameter": "130.043 TO 130.068",
-    "rollerBearingOuterDia": "280 (+0.0/-0.035)",
-    "rollerBearingBoreDia": "130 (+0.0/-0.025)",
-    "rollerBearingWidth": "93 (+0/-0.250)",
-    "axleBoxHousingBoreDia": "280 (+0.030/+0.052)",
-    "wheelDiscWidth": "127 (+4/-0)"
-  }
-}
+**Request:**
+```bash
+curl -X POST http://localhost:8000/api/forms/wheel-specifications/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "formNumber": "WHEEL-2025-001",
+    "submittedBy": "user_id_123",
+    "submittedDate": "2025-07-27",
+    "fields": {
+      "treadDiameterNew": "915 (900-1000)",
+      "lastShopIssueSize": "837 (800-900)",
+      "condemningDia": "825 (800-900)",
+      "wheelGauge": "1600 (+2,-1)",
+      "variationSameAxle": "0.5",
+      "variationSameBogie": "5",
+      "variationSameCoach": "13",
+      "wheelProfile": "29.4 Flange Thickness",
+      "intermediateWWP": "20 TO 28",
+      "bearingSeatDiameter": "130.043 TO 130.068",
+      "rollerBearingOuterDia": "280 (+0.0/-0.035)",
+      "rollerBearingBoreDia": "130 (+0.0/-0.025)",
+      "rollerBearingWidth": "93 (+0/-0.250)",
+      "axleBoxHousingBoreDia": "280 (+0.030/+0.052)",
+      "wheelDiscWidth": "127 (+4/-0)"
+    }
+  }'
 ```
 
-**Get Wheel Specifications with Filters:**
-```
-GET /api/forms/wheel-specifications/?formNumber=WHEEL-2025-001&submittedBy=user_id_123
-```
-
-## 🏗️ Project Structure
-
-```
-kpa_api/
-├── manage.py
-├── requirements.txt
-├── pyproject.toml              # UV dependencies
-├── .env.example                # Environment template
-├── Dockerfile                  # Multi-stage Docker build
-├── docker-compose.yml          # Development environment
-├── kpa_api/                    # Main project settings
-├── apps/
-│   ├── common/                 # Shared utilities
-│   └── forms/                  # Forms management app
-│       ├── models.py           # Database models
-│       ├── serializers.py      # DRF serializers
-│       ├── views.py            # API views
-│       ├── urls.py             # URL routing
-│       └── admin.py            # Django admin
-└── static/                     # Static files
-```
-
-## 🔒 Security Features
-
-- Environment-based configuration
-- Input validation and serialization
-- CORS protection
-- SQL injection prevention (Django ORM)
-- XSS protection headers
-- CSRF protection
-
-## 📊 Database Schema
-
-### WheelSpecification Model
-- Form metadata (form_number, submitted_by, submitted_date)
-- Technical specifications (15+ fields for wheel measurements)
-- Timestamps (created_at, updated_at)
-
-### BogieChecksheet Model
-- Inspection metadata
-- Related BogieDetail model
-- Checksheet fields for bogie and BMBC components
-
-## ⚡ Performance Optimizations
-
-- **Docker Multi-stage Build**: Reduces image size by ~60%
-- **UV Package Manager**: 10-100x faster than pip
-- **Alpine Linux Base**: Minimal container footprint
-- **Database Indexing**: Optimized queries with proper indexing
-- **Connection Pooling**: Efficient database connections
-- **Static File Optimization**: WhiteNoise for static file serving
-
-## 🔧 Management Commands
-
-Create custom management commands in `apps/forms/management/commands/`:
-
-```python
-# apps/forms/management/commands/generate_sample_data.py
-from django.core.management.base import BaseCommand
-from apps.forms.models import WheelSpecification
-from datetime import date
-
-class Command(BaseCommand):
-    help = 'Generate sample wheel specification data'
-    
-    def handle(self, *args, **options):
-        WheelSpecification.objects.create(
-            form_number="WHEEL-2025-SAMPLE",
-            submitted_by="sample_user",
-            submitted_date=date.today(),
-            tread_diameter_new="915 (900-1000)",
-            last_shop_issue_size="837 (800-900)",
-            # ... other fields
-        )
-        self.stdout.write(
-            self.style.SUCCESS('Successfully created sample data')
-        )
-```
-
-Run with: `python manage.py generate_sample_data`
-
-## 🐳 Docker Best Practices
-
-### Multi-stage Build Benefits:
-- **Development Stage**: Includes build tools and dependencies
-- **Production Stage**: Only runtime dependencies
-- **Size Reduction**: ~200MB vs ~500MB traditional builds
-- **Security**: Minimal attack surface with Alpine Linux
-
-### Container Health Checks:
-```dockerfile
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/health/', timeout=10)"
-```
-
-## 🔍 API Response Formats
-
-### Success Response:
+**Response:**
 ```json
 {
   "success": true,
@@ -249,50 +241,129 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   "data": {
     "formNumber": "WHEEL-2025-001",
     "submittedBy": "user_id_123",
-    "submittedDate": "2025-07-03",
+    "submittedDate": "2025-07-27",
     "status": "Saved"
   }
 }
 ```
 
-### Error Response:
+### Get Wheel Specifications with Filters
+
+```bash
+# Get all wheel specifications
+curl http://localhost:8000/api/forms/wheel-specifications/
+
+# Filter by form number
+curl "http://localhost:8000/api/forms/wheel-specifications/?formNumber=WHEEL-2025-001"
+
+# Filter by submitted by
+curl "http://localhost:8000/api/forms/wheel-specifications/?submittedBy=user_id_123"
+
+# Filter by date
+curl "http://localhost:8000/api/forms/wheel-specifications/?submittedDate=2025-07-27"
+
+# Multiple filters
+curl "http://localhost:8000/api/forms/wheel-specifications/?formNumber=WHEEL-2025-001&submittedBy=user_id_123"
+```
+
+## 🏗️ Project Structure
+
+```
+kpa_backend/
+├── manage.py
+├── requirements.txt
+├── Dockerfile
+├── .env.example
+├── .gitignore
+├── README.md
+├── kpa_backend/              # Main project settings
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+└── apps/
+    └── forms/                # Forms management app
+        ├── __init__.py
+        ├── models.py         # WheelSpecification model
+        ├── serializers.py    # DRF serializers
+        ├── views.py          # API views
+        ├── urls.py           # URL routing
+        ├── admin.py          # Django admin
+        └── migrations/       # Database migrations
+```
+
+## 🔒 Security Features
+
+- Environment-based configuration
+- Input validation and serialization
+- SQL injection prevention (Django ORM)
+- Form number validation
+- Error handling with structured responses
+- CORS protection capabilities
+
+## 📊 Database Schema
+
+### WheelSpecification Model
+
+**Metadata Fields:**
+- `form_number` (CharField) - Unique form identifier
+- `submitted_by` (CharField) - User who submitted the form
+- `submitted_date` (DateField) - Form submission date
+- `status` (CharField) - Form status (default: "Saved")
+- `created_at` (DateTimeField) - Auto-generated creation timestamp
+- `updated_at` (DateTimeField) - Auto-generated update timestamp
+
+**Technical Specification Fields:**
+- `tread_diameter_new` - New tread diameter specifications
+- `last_shop_issue_size` - Last shop issue size
+- `condemning_dia` - Condemning diameter
+- `wheel_gauge` - Wheel gauge measurements
+- `variation_same_axle` - Variation on same axle
+- `variation_same_bogie` - Variation on same bogie
+- `variation_same_coach` - Variation on same coach
+- `wheel_profile` - Wheel profile specifications
+- `intermediate_wwp` - Intermediate WWP measurements
+- `bearing_seat_diameter` - Bearing seat diameter
+- `roller_bearing_outer_dia` - Roller bearing outer diameter
+- `roller_bearing_bore_dia` - Roller bearing bore diameter
+- `roller_bearing_width` - Roller bearing width
+- `axle_box_housing_bore_dia` - Axle box housing bore diameter
+- `wheel_disc_width` - Wheel disc width
+
+## ⚡ API Features
+
+### Response Format
+All API responses follow a consistent structure:
+
+**Success Response:**
 ```json
 {
-  "success": false,
-  "message": "Validation failed.",
-  "errors": {
-    "formNumber": ["Form number must start with 'WHEEL-'"]
-  }
+  "success": true,
+  "message": "Operation completed successfully",
+  "data": { /* response data */ }
 }
 ```
 
-## 🧪 Testing
-
-### Unit Tests (Optional Enhancement):
-```python
-# apps/forms/tests.py
-from django.test import TestCase
-from rest_framework.test import APITestCase
-from rest_framework import status
-from .models import WheelSpecification
-
-class WheelSpecificationAPITest(APITestCase):
-    def test_create_wheel_specification(self):
-        data = {
-            "formNumber": "WHEEL-2025-TEST",
-            "submittedBy": "test_user",
-            "submittedDate": "2025-07-03",
-            "fields": {
-                "treadDiameterNew": "915 (900-1000)",
-                # ... other required fields
-            }
-        }
-        response = self.client.post('/api/forms/wheel-specifications/', data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(response.data['success'])
+**Error Response:**
+```json
+{
+  "success": false,
+  "message": "Error description",
+  "errors": { /* validation errors */ }
+}
 ```
 
-Run tests: `python manage.py test`
+### Filtering Capabilities
+- **Form Number**: Exact match filtering
+- **Submitted By**: Exact match filtering  
+- **Submitted Date**: Date-based filtering (YYYY-MM-DD format)
+- **Multiple Filters**: Combine multiple filters using query parameters
+
+### Validation Rules
+- Form numbers must start with 'WHEEL-'
+- All required fields must be provided
+- Date fields must be in valid format
+- Field length restrictions as per model definition
 
 ## 🌍 Environment Variables
 
@@ -303,92 +374,98 @@ Run tests: `python manage.py test`
 | `DB_NAME` | Database name | `kpa_db` | ✅ |
 | `DB_USER` | Database user | `postgres` | ✅ |
 | `DB_PASSWORD` | Database password | - | ✅ |
-| `DB_HOST` | Database host | `localhost` | - |
+| `DB_HOST` | Database host | `localhost` | ✅ |
 | `DB_PORT` | Database port | `5432` | - |
-| `ALLOWED_HOSTS` | Allowed hosts | `localhost` | - |
-| `CORS_ALLOWED_ORIGINS` | CORS origins | `http://localhost:3000` | - |
+| `ALLOWED_HOSTS` | Comma-separated allowed hosts | `localhost` | - |
 
-## 🚀 Deployment
+## 🚀 Production Deployment
 
-### Production Checklist:
-1. Set `DEBUG=False`
+### Pre-deployment Checklist:
+1. Set `DEBUG=False` in environment
 2. Configure proper `SECRET_KEY`
-3. Set up PostgreSQL database
-4. Configure static file serving
-5. Set up reverse proxy (Nginx)
-6. Enable SSL/TLS
-7. Configure logging
-8. Set up monitoring
+3. Set up production PostgreSQL database
+4. Configure `ALLOWED_HOSTS` for your domain
+5. Set up reverse proxy (Nginx recommended)
+6. Enable SSL/TLS certificates
+7. Configure logging and monitoring
 
-### Docker Deployment:
+### Docker Production Deployment:
 ```bash
 # Build production image
-docker build -t kpa-api:latest .
+docker build -t kpa-backend:production .
 
-# Run with production settings
-docker run -d \
-  --name kpa-api \
+# Run with production environment
+docker run -d --name kpa-backend-prod \
   -p 8000:8000 \
-  --env-file .env.prod \
-  kpa-api:latest
+  --env-file .env.production \
+  --restart unless-stopped \
+  kpa-backend:production
 ```
 
-## 📈 Monitoring and Logging
+## 📝 Management Commands
 
-### Application Logs:
-- Django logs: `/app/logs/django.log`
-- Gunicorn access logs
-- Error tracking with structured logging
+### Database Operations:
+```bash
+# Create migrations
+python manage.py makemigrations
 
-### Health Check Endpoint:
-```python
-# Add to urls.py
-path('health/', lambda request: JsonResponse({
-    'status': 'ok',
-    'timestamp': timezone.now().isoformat(),
-    'version': '1.0.0'
-}))
+# Apply migrations
+python manage.py migrate
+
+# Create superuser
+python manage.py createsuperuser
+
+# Check for issues
+python manage.py check
+
+# Collect static files (if needed)
+python manage.py collectstatic
 ```
 
-## 🤝 Contributing
+### Docker Operations:
+```bash
+# View container logs
+docker logs kpa-backend
 
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature-name`
-3. Commit changes: `git commit -am 'Add feature'`
-4. Push to branch: `git push origin feature-name`
-5. Submit pull request
+# Execute commands in container
+docker exec kpa-backend python manage.py migrate
 
-## 📝 Limitations and Assumptions
+# Stop and remove containers
+docker stop kpa-backend
+docker rm kpa-backend
 
-### Current Limitations:
-- No authentication/authorization implemented
-- Basic validation only (can be enhanced)
-- No file upload handling for attachments
-- No audit trail for form modifications
-- No email notifications
+# Remove image
+docker rmi kpa-backend
+```
 
-### Assumptions Made:
-- Form numbers follow specific patterns (WHEEL-*, BOGIE-*)
-- All measurements stored as strings for flexibility
-- Single database instance (no sharding)
-- Basic error handling sufficient for demo
+## 🐛 Troubleshooting
 
-### Future Enhancements:
-- User authentication with JWT/OAuth2
-- File upload for supporting documents
-- Advanced validation rules
-- Real-time notifications
-- Audit logging
-- API rate limiting
-- Automated testing pipeline
-- Monitoring dashboard
+### Common Issues:
+
+**Database Connection Error:**
+- Verify PostgreSQL is running
+- Check database credentials in `.env`
+- Ensure database exists
+
+**Import Error for Exception Handler:**
+- The project includes a reference to `apps.common.exceptions` which isn't implemented
+- This can be safely removed from settings if not needed
+
+**Docker Container Won't Start:**
+- Check environment variables
+- Verify database connectivity
+- Review container logs: `docker logs kpa-backend`
+
+**API Returns 405 Method Not Allowed:**
+- Verify URL routing in `apps/forms/urls.py`
+- Check HTTP method (GET/POST) matches endpoint
 
 ## 📞 Support
 
-For questions or support:
-- Email: contact@suvidhaen.com
-- Create an issue in the repository
-- Check API documentation at `/api/docs/`
+For questions or issues:
+- Check the API documentation at `/api/docs/`
+- Review the troubleshooting section above
+- Examine application logs for detailed error messages
 
 ## 📄 License
 
@@ -396,4 +473,4 @@ This project is developed for the KPA assignment evaluation.
 
 ---
 
-**Note**: This implementation demonstrates Django REST Framework best practices including proper serialization, validation, error handling, and API documentation. The Docker setup uses UV for faster dependency management and multi-stage builds for optimal image size.
+**Note**: This implementation demonstrates Django REST Framework best practices including proper serialization, validation, error handling, filtering capabilities, and comprehensive API documentation. The Docker setup provides flexibility for both development and production deployments.
