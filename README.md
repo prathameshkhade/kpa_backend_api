@@ -37,7 +37,7 @@ A Django REST Framework API for managing KPA wheel specification forms with filt
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/prathameshkhade/kpa_backend_api.git
    cd kpa_backend
    ```
 
