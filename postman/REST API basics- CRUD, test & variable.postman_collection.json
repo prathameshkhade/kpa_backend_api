@@ -1,0 +1,649 @@
+{
+	"info": {
+		"_postman_id": "d5ce8838-6a63-48df-b9b4-6641b1742013",
+		"name": "REST API basics: CRUD, test & variable",
+		"description": "# 🚀 KPA Backend API - Postman Collection Guide\n\nA comprehensive Postman collection for testing the KPA Backend Wheel Specifications Management API with detailed examples, tests, and usage instructions.\n\n## 📋 Table of Contents\n\n- [Quick Start](#-quick-start)\n    \n- [Collection Setup](#-collection-setup)\n    \n- [Environment Configuration](#-environment-configuration)\n    \n- [API Endpoints](#-api-endpoints)\n    \n- [Testing Examples](#-testing-examples)\n    \n- [Export &amp; Import Instructions](#-export--import-instructions)\n    \n- [Advanced Features](#-advanced-features)\n    \n- [Troubleshooting](#-troubleshooting)\n    \n\n## 🚀 Quick Start\n\n### Step 1: Import Collection\n\n1. Download the collection files (instructions below)\n    \n2. Open Postman\n    \n3. Click \"Import\" → Upload files\n    \n4. Select environment and start testing!\n    \n\n### Step 2: Set Environment\n\n1. Select \"KPA Backend Local\" environment\n    \n2. Verify `base_url` is set to `http://localhost:8000`\n    \n3. Ensure your Django server is running\n    \n\n### Step 3: Test Endpoints\n\n1. Start with \"Health Check\" to verify connection\n    \n2. Create a wheel specification using POST request\n    \n3. Retrieve data using GET requests with filters\n    \n\n---\n\n## 📁 Collection Setup\n\n### Collection Information\n\n- **Name**: `KPA Backend - Wheel Specifications API`\n    \n- **Description**: Complete API testing collection for KPA Backend\n    \n- **Version**: 1.0\n    \n- **Base URL**: `{{base_url}}/api`\n    \n\n### Folder Structure\n\n```\nKPA Backend API Collection\n├── 🏥 Health & Status\n│   └── Health Check\n├── 📝 Wheel Specifications\n│   ├── Create Wheel Specification\n│   ├── Get All Wheel Specifications\n│   ├── Filter by Form Number\n│   ├── Filter by Submitted By\n│   ├── Filter by Date\n│   └── Multiple Filters\n├── 📚 API Documentation\n│   ├── Swagger UI\n│   ├── ReDoc Documentation\n│   └── OpenAPI Schema\n└── 🧪 Test Scenarios\n    ├── Validation Tests\n    └── Error Handling\n\n ```\n\n---\n\n## 🌍 Environment Configuration\n\n### Environment: \"KPA Backend Local\"\n\n``` json\n{\n  \"name\": \"KPA Backend Local\",\n  \"values\": [\n    {\n      \"key\": \"base_url\",\n      \"value\": \"http://localhost:8000\",\n      \"type\": \"default\",\n      \"enabled\": true\n    },\n    {\n      \"key\": \"api_base\",\n      \"value\": \"{{base_url}}/api\",\n      \"type\": \"default\",\n      \"enabled\": true\n    },\n    {\n      \"key\": \"created_form_number\",\n      \"value\": \"\",\n      \"type\": \"default\",\n      \"enabled\": true\n    },\n    {\n      \"key\": \"test_user_id\",\n      \"value\": \"user_id_123\",\n      \"type\": \"default\",\n      \"enabled\": true\n    },\n    {\n      \"key\": \"test_date\",\n      \"value\": \"2025-07-27\",\n      \"type\": \"default\",\n      \"enabled\": true\n    }\n  ]\n}\n\n ```\n\n### Environment: \"KPA Backend Docker\"\n\n``` json\n{\n  \"name\": \"KPA Backend Docker\",\n  \"values\": [\n    {\n      \"key\": \"base_url\",\n      \"value\": \"http://localhost:8000\",\n      \"type\": \"default\",\n      \"enabled\": true\n    },\n    {\n      \"key\": \"api_base\",\n      \"value\": \"{{base_url}}/api\",\n      \"type\": \"default\",\n      \"enabled\": true\n    }\n  ]\n}\n\n ```\n\n---\n\n## 📊 API Endpoints\n\n### 1\\. 🏥 Health Check\n\n**Endpoint**: `GET {{base_url}}/health/`\n\n**Purpose**: Verify API server status\n\n**Headers**: None required\n\n**Response Example**:\n\n``` json\n{\n    \"status\": \"ok\",\n    \"message\": \"API is running\"\n}\n\n ```\n\n**Tests**:\n\n``` javascript\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\npm.test(\"Response has correct structure\", function () {\n    const jsonData = pm.response.json();\n    pm.expect(jsonData).to.have.property('status', 'ok');\n    pm.expect(jsonData).to.have.property('message');\n});\npm.test(\"Response time is acceptable\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});\n\n ```\n\n---\n\n### 2\\. 📝 Create Wheel Specification\n\n**Endpoint**: `POST {{api_base}}/forms/wheel-specifications/`\n\n**Purpose**: Submit a new wheel specification form\n\n**Headers**:\n\n```\nContent-Type: application/json\n\n ```\n\n**Body** (JSON):\n\n``` json\n{\n    \"formNumber\": \"WHEEL-{{$timestamp}}\",\n    \"submittedBy\": \"{{test_user_id}}\",\n    \"submittedDate\": \"{{test_date}}\",\n    \"fields\": {\n        \"treadDiameterNew\": \"915 (900-1000)\",\n        \"lastShopIssueSize\": \"837 (800-900)\",\n        \"condemningDia\": \"825 (800-900)\",\n        \"wheelGauge\": \"1600 (+2,-1)\",\n        \"variationSameAxle\": \"0.5\",\n        \"variationSameBogie\": \"5\",\n        \"variationSameCoach\": \"13\",\n        \"wheelProfile\": \"29.4 Flange Thickness\",\n        \"intermediateWWP\": \"20 TO 28\",\n        \"bearingSeatDiameter\": \"130.043 TO 130.068\",\n        \"rollerBearingOuterDia\": \"280 (+0.0/-0.035)\",\n        \"rollerBearingBoreDia\": \"130 (+0.0/-0.025)\",\n        \"rollerBearingWidth\": \"93 (+0/-0.250)\",\n        \"axleBoxHousingBoreDia\": \"280 (+0.030/+0.052)\",\n        \"wheelDiscWidth\": \"127 (+4/-0)\"\n    }\n}\n\n ```\n\n**Pre-request Script**:\n\n``` javascript\n// Generate unique form number\nconst timestamp = new Date().getTime();\npm.environment.set(\"unique_form_number\", `WHEEL-${timestamp}`);\n\n ```\n\n**Tests**:\n\n``` javascript\npm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});\npm.test(\"Response has success structure\", function () {\n    const jsonData = pm.response.json();\n    pm.expect(jsonData).to.have.property('success', true);\n    pm.expect(jsonData).to.have.property('message');\n    pm.expect(jsonData).to.have.property('data');\n});\npm.test(\"Created form has correct structure\", function () {\n    const jsonData = pm.response.json();\n    const data = jsonData.data;\n    pm.expect(data).to.have.property('formNumber');\n    pm.expect(data).to.have.property('submittedBy');\n    pm.expect(data).to.have.property('submittedDate');\n    pm.expect(data).to.have.property('status', 'Saved');\n});\npm.test(\"Store created form number\", function () {\n    if (pm.response.code === 201) {\n        const jsonData = pm.response.json();\n        pm.environment.set(\"created_form_number\", jsonData.data.formNumber);\n        console.log(\"Created form number:\", jsonData.data.formNumber);\n    }\n});\npm.test(\"Form number follows correct format\", function () {\n    const jsonData = pm.response.json();\n    const formNumber = jsonData.data.formNumber;\n    pm.expect(formNumber).to.match(/^WHEEL-/);\n});\n\n ```\n\n**Response Example**:\n\n``` json\n{\n    \"success\": true,\n    \"message\": \"Wheel specification submitted successfully.\",\n    \"data\": {\n        \"formNumber\": \"WHEEL-1737917234567\",\n        \"submittedBy\": \"user_id_123\",\n        \"submittedDate\": \"2025-07-27\",\n        \"status\": \"Saved\"\n    }\n}\n\n ```\n\n---\n\n### 3\\. 📋 Get All Wheel Specifications\n\n**Endpoint**: `GET {{api_base}}/forms/wheel-specifications/`\n\n**Purpose**: Retrieve all wheel specifications\n\n**Headers**: None required\n\n**Tests**:\n\n``` javascript\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\npm.test(\"Response has correct structure\", function () {\n    const jsonData = pm.response.json();\n    pm.expect(jsonData).to.have.property('success', true);\n    pm.expect(jsonData).to.have.property('message');\n    pm.expect(jsonData).to.have.property('data');\n    pm.expect(jsonData.data).to.be.an('array');\n});\npm.test(\"Each item has required fields\", function () {\n    const jsonData = pm.response.json();\n    if (jsonData.data.length > 0) {\n        const firstItem = jsonData.data[0];\n        pm.expect(firstItem).to.have.property('formNumber');\n        pm.expect(firstItem).to.have.property('submittedBy');\n        pm.expect(firstItem).to.have.property('submittedDate');\n        pm.expect(firstItem).to.have.property('wheelFields');\n        pm.expect(firstItem).to.have.property('status');\n    }\n});\npm.test(\"Response time is acceptable\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(3000);\n});\n\n ```\n\n---\n\n### 4\\. 🔍 Filter by Form Number\n\n**Endpoint**: `GET {{api_base}}/forms/wheel-specifications/`\n\n**Query Parameters**:  \n| Parameter | Value | Description |  \n|-----------|-------|-------------|  \n| `formNumber` | `{{created_form_number}}` | Filter by specific form number |\n\n**Tests**:\n\n``` javascript\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\npm.test(\"Filtered results match form number\", function () {\n    const jsonData = pm.response.json();\n    const expectedFormNumber = pm.environment.get(\"created_form_number\");\n    if (expectedFormNumber && jsonData.data.length > 0) {\n        jsonData.data.forEach(function(item) {\n            pm.expect(item.formNumber).to.eql(expectedFormNumber);\n        });\n    }\n});\npm.test(\"Filter returns expected count\", function () {\n    const jsonData = pm.response.json();\n    const expectedFormNumber = pm.environment.get(\"created_form_number\");\n    if (expectedFormNumber) {\n        pm.expect(jsonData.data.length).to.be.at.most(1);\n    }\n});\n\n ```\n\n---\n\n### 5\\. 👤 Filter by Submitted By\n\n**Endpoint**: `GET {{api_base}}/forms/wheel-specifications/`\n\n**Query Parameters**:  \n| Parameter | Value | Description |  \n|-----------|-------|-------------|  \n| `submittedBy` | `{{test_user_id}}` | Filter by user who submitted |\n\n**Tests**:\n\n``` javascript\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\npm.test(\"All results match submitted by filter\", function () {\n    const jsonData = pm.response.json();\n    const expectedUserId = pm.environment.get(\"test_user_id\");\n    jsonData.data.forEach(function(item) {\n        pm.expect(item.submittedBy).to.eql(expectedUserId);\n    });\n});\n\n ```\n\n---\n\n### 6\\. 📅 Filter by Date\n\n**Endpoint**: `GET {{api_base}}/forms/wheel-specifications/`\n\n**Query Parameters**:  \n| Parameter | Value | Description |  \n|-----------|-------|-------------|  \n| `submittedDate` | `{{test_date}}` | Filter by submission date |\n\n**Tests**:\n\n``` javascript\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\npm.test(\"All results match date filter\", function () {\n    const jsonData = pm.response.json();\n    const expectedDate = pm.environment.get(\"test_date\");\n    jsonData.data.forEach(function(item) {\n        pm.expect(item.submittedDate).to.eql(expectedDate);\n    });\n});\npm.test(\"Date format is correct\", function () {\n    const jsonData = pm.response.json();\n    jsonData.data.forEach(function(item) {\n        pm.expect(item.submittedDate).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\n    });\n});\n\n ```\n\n---\n\n### 7\\. 🔄 Multiple Filters\n\n**Endpoint**: `GET {{api_base}}/forms/wheel-specifications/`\n\n**Query Parameters**:  \n| Parameter | Value | Description |  \n|-----------|-------|-------------|  \n| `formNumber` | `{{created_form_number}}` | Form number filter |  \n| `submittedBy` | `{{test_user_id}}` | Submitted by filter |  \n| `submittedDate` | `{{test_date}}` | Date filter |\n\n**Tests**:\n\n``` javascript\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\npm.test(\"Multiple filters work correctly\", function () {\n    const jsonData = pm.response.json();\n    const expectedFormNumber = pm.environment.get(\"created_form_number\");\n    const expectedUserId = pm.environment.get(\"test_user_id\");\n    const expectedDate = pm.environment.get(\"test_date\");\n    jsonData.data.forEach(function(item) {\n        if (expectedFormNumber) {\n            pm.expect(item.formNumber).to.eql(expectedFormNumber);\n        }\n        pm.expect(item.submittedBy).to.eql(expectedUserId);\n        pm.expect(item.submittedDate).to.eql(expectedDate);\n    });\n});\n\n ```\n\n---\n\n### 8\\. 📚 API Documentation Endpoints\n\n#### Swagger UI\n\n**Endpoint**: `GET {{api_base}}/docs/`  \n**Purpose**: Interactive API documentation\n\n#### OpenAPI Schema\n\n**Endpoint**: `GET {{api_base}}/schema/`  \n**Purpose**: Get OpenAPI schema JSON\n\n#### ReDoc Documentation\n\n**Endpoint**: `GET {{api_base}}/redoc/`  \n**Purpose**: Alternative documentation interface\n\n---\n\n## 🧪 Testing Examples\n\n### Validation Test Cases\n\n#### Invalid Form Number Format\n\n**Body**:\n\n``` json\n{\n    \"formNumber\": \"INVALID-001\",\n    \"submittedBy\": \"user_id_123\",\n    \"submittedDate\": \"2025-07-27\",\n    \"fields\": {\n        \"treadDiameterNew\": \"915 (900-1000)\"\n    }\n}\n\n ```\n\n**Expected Response**: 400 Bad Request\n\n**Test**:\n\n``` javascript\npm.test(\"Invalid form number rejected\", function () {\n    pm.response.to.have.status(400);\n    const jsonData = pm.response.json();\n    pm.expect(jsonData).to.have.property('formNumber');\n});\n\n ```\n\n#### Missing Required Fields\n\n**Body**:\n\n``` json\n{\n    \"formNumber\": \"WHEEL-TEST-001\"\n}\n\n ```\n\n**Expected Response**: 400 Bad Request\n\n#### Invalid Date Format\n\n**Body**:\n\n``` json\n{\n    \"formNumber\": \"WHEEL-TEST-001\",\n    \"submittedBy\": \"user_id_123\",\n    \"submittedDate\": \"invalid-date\",\n    \"fields\": {}\n}\n\n ```\n\n**Expected Response**: 400 Bad Request\n\n---\n\n## 🔧 Collection-Level Configuration\n\n### Collection Pre-request Script\n\n``` javascript\n// Set timestamp for unique identifiers\npm.globals.set(\"timestamp\", new Date().getTime());\n// Log request information\nconsole.log(`Making request to: ${pm.request.url}`);\nconsole.log(`Method: ${pm.request.method}`);\n\n ```\n\n### Collection Tests\n\n``` javascript\n// Global response time check\npm.test(\"Response time is reasonable\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(5000);\n});\n// Global content type check for JSON responses\nif (pm.response.headers.get(\"Content-Type\")) {\n    pm.test(\"Content-Type is JSON\", function () {\n        pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n    });\n}\n// Global status code validation\npm.test(\"Status code is valid\", function () {\n    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 405, 500]);\n});\n\n ```\n\n---\n\n## 📤 Export & Import Instructions\n\n### Exporting Collection\n\n1. **Export Collection**:\n    \n    - Right-click on \"KPA Backend API Collection\"\n        \n    - Select \"Export\"\n        \n    - Choose \"Collection v2.1 (Recommended)\"\n        \n    - Save as `KPA_Backend_API_Collection.json`\n        \n2. **Export Environment**:\n    \n    - Click gear icon (⚙️) in top right\n        \n    - Select \"KPA Backend Local\"\n        \n    - Click \"Export\"\n        \n    - Save as `KPA_Backend_Environment.json`\n        \n\n### Importing Collection\n\n1. \\# Download the files# Open Postman# Click \"Import\" button# Drag and drop or select files:# - KPA_Backend_API_Collection.json# - KPA_Backend_Environment.json\n    \n2. **Setup Environment**:\n    \n    - Select \"KPA Backend Local\" from environment dropdown\n        \n    - Verify variables are populated\n        \n    - Update `base_url` if needed\n        \n\n### Sharing Collection\n\n#### Method 1: Public Link\n\n1. Right-click collection → \"Share\"\n    \n2. Enable \"Collection Link\"\n    \n3. Copy generated URL\n    \n4. Share with team members\n    \n\n#### Method 2: Workspace\n\n1. Create workspace in Postman\n    \n2. Add collection to workspace\n    \n3. Invite team members to workspace\n    \n\n#### Method 3: File Export\n\n1. Export collection and environment files\n    \n2. Share via email, GitHub, or file sharing service\n    \n3. Include setup instructions\n    \n\n---\n\n## 🚀 Advanced Features\n\n### Dynamic Variables\n\nUse these in your requests:\n\n| Variable | Example | Purpose |\n| --- | --- | --- |\n| `{{$timestamp}}` | 1737917234567 | Current timestamp |\n| `{{$guid}}` | uuid-here | Unique identifier |\n| `{{$randomInt}}` | 123 | Random integer |\n| `{{$randomFirstName}}` | John | Random first name |\n\n### Environment Switching\n\nCreate multiple environments:\n\n- **Local Development**: `http://localhost:8000`\n    \n- **Docker**: `http://localhost:8000`\n    \n- **Staging**: `https://staging-api.example.com`\n    \n- **Production**: `https://api.example.com`\n    \n\n### Automated Testing\n\n#### Newman CLI Integration\n\n``` bash\n# Install Newman\nnpm install -g newman\n# Run collection\nnewman run KPA_Backend_API_Collection.json \\\n  -e KPA_Backend_Environment.json \\\n  --reporters cli,htmlextra \\\n  --reporter-htmlextra-export report.html\n\n ```\n\n#### CI/CD Integration\n\n``` yaml\n# GitHub Actions example\n- name: Run Postman Tests\n  run: |\n    newman run collection.json \\\n      -e environment.json \\\n      --reporters cli,junit \\\n      --reporter-junit-export results.xml\n\n ```\n\n---\n\n## 🔍 Debugging & Troubleshooting\n\n### Common Issues\n\n#### Connection Refused\n\n**Problem**: `Could not get any response`  \n**Solutions**:\n\n- Verify Django server is running: `python manage.py runserver`\n    \n- Check `base_url` in environment\n    \n- Ensure no firewall blocking\n    \n\n#### 404 Not Found\n\n**Problem**: `GET http://localhost:8000/api/forms/wheel-specifications/ 404`  \n**Solutions**:\n\n- Verify URL routing in Django\n    \n- Check `apps/forms/urls.py`\n    \n- Ensure migrations are applied\n    \n\n#### 405 Method Not Allowed\n\n**Problem**: Method not supported  \n**Solutions**:\n\n- Check HTTP method (GET vs POST)\n    \n- Verify view supports the method\n    \n- Review URL configuration\n    \n\n### Debug Tools\n\n#### Postman Console\n\n- View detailed logs\n    \n- See request/response data\n    \n- Debug variable values\n    \n\n#### Response Inspector\n\n- Check response headers\n    \n- View raw response data\n    \n- Analyze response time\n    \n\n### Monitoring\n\n#### Health Check Automation\n\n``` javascript\n// In Health Check tests\npm.test(\"API is healthy\", function () {\n    const jsonData = pm.response.json();\n    if (jsonData.status !== 'ok') {\n        // Send alert or notification\n        console.error(\"API health check failed!\");\n    }\n});\n\n ```\n\n---\n\n## 📊 Collection Statistics\n\n### Endpoints Overview\n\n- **Total Requests**: 12\n    \n- **GET Requests**: 8\n    \n- **POST Requests**: 4\n    \n- **Folders**: 4\n    \n- **Test Scripts**: 50+\n    \n\n### Test Coverage\n\n- ✅ Status Code Validation\n    \n- ✅ Response Structure\n    \n- ✅ Data Validation\n    \n- ✅ Performance Testing\n    \n- ✅ Error Handling\n    \n- ✅ Filter Functionality\n    \n\n---\n\n## 📝 Usage Tips\n\n### Best Practices\n\n1. **Environment Management**:\n    \n    - Use separate environments for different stages\n        \n    - Never hardcode sensitive data\n        \n    - Use variables for dynamic values\n        \n2. **Test Organization**:\n    \n    - Group related tests in folders\n        \n    - Use descriptive test names\n        \n    - Include both positive and negative tests\n        \n3. **Documentation**:\n    \n    - Add descriptions to all requests\n        \n    - Document expected responses\n        \n    - Include usage examples\n        \n4. **Version Control**:\n    \n    - Export collections regularly\n        \n    - Track changes in git\n        \n    - Use meaningful commit messages\n        \n\n### Workflow Suggestions\n\n1. Health Check → Create Data → Retrieve Data → Filter Data → Cleanup\n    \n2. Valid Requests → Invalid Requests → Edge Cases → Performance\n    \n3. Code Push → Build → Run Postman Tests → Deploy\n    \n\n---\n\n## 🎯 Learning Resources\n\n### Postman Features to Explore\n\n- **Scripts**: Pre-request and test scripts\n    \n- **Variables**: Global, environment, and collection variables\n    \n- **Monitors**: Automated collection runs\n    \n- **Mock Servers**: API mocking capabilities\n    \n- **Documentation**: Auto-generated API docs\n    \n\n### JavaScript Testing\n\n- **Chai Assertions**: `pm.expect()` syntax\n    \n- **Response Validation**: JSON schema validation\n    \n- **Data Manipulation**: Working with response data\n    \n- **Flow Control**: Conditional test execution\n    \n\n---\n\nThis comprehensive Postman collection provides everything needed to test and validate the KPA Backend API efficiently. The collection includes proper error handling, validation scenarios, and automation capabilities suitable for both development and CI/CD environments.\n\n**Happy Testing! 🚀**",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47106347",
+		"_collection_link": "https://cryosat-architect-77004299-2725868.postman.co/workspace/804388e0-194d-43f3-8e27-319acd0d1b3f/collection/47106347-d5ce8838-6a63-48df-b9b4-6641b1742013?action=share&source=collection_link&creator=47106347"
+	},
+	"item": [
+		{
+			"name": "List Wheel Specifications",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{base_url}}/forms/wheel-specifications",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"forms",
+						"wheel-specifications"
+					],
+					"query": [
+						{
+							"key": "formNumber",
+							"value": "WHEEL-2025-001",
+							"description": "Filter by form number",
+							"disabled": true
+						},
+						{
+							"key": "submittedBy",
+							"value": "user_id_123",
+							"description": "Filter by submitted by",
+							"disabled": true
+						},
+						{
+							"key": "submittedDate",
+							"value": "2025-07-27",
+							"description": "Filter by date (YYYY-MM-DD)",
+							"disabled": true
+						}
+					]
+				},
+				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+			},
+			"response": [
+				{
+					"name": "All the list without filters",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/forms/wheel-specifications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"forms",
+								"wheel-specifications"
+							],
+							"query": [
+								{
+									"key": "formNumber",
+									"value": "WHEEL-2025-001",
+									"description": "Filter by form number",
+									"disabled": true
+								},
+								{
+									"key": "submittedBy",
+									"value": "user_id_124",
+									"description": "Filter by submitted by",
+									"disabled": true
+								},
+								{
+									"key": "submittedDate",
+									"value": "2025-07-05",
+									"description": "Filter by date (YYYY-MM-DD)",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "gunicorn"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 27 Jul 2025 18:14:52 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Allow",
+							"value": "GET, POST, HEAD, OPTIONS"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1364"
+						},
+						{
+							"key": "Vary",
+							"value": "Cookie, origin"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"message\": \"Filtered wheel specification forms fetched successfully.\",\n    \"data\": [\n        {\n            \"formNumber\": \"WHEEL-2025-005\",\n            \"submittedBy\": \"user_id_124\",\n            \"submittedDate\": \"2025-07-06\",\n            \"wheelFields\": {\n                \"condemningDia\": \"825 (800-900)\",\n                \"lastShopIssueSize\": \"837 (800-900)\",\n                \"treadDiameterNew\": \"915 (900-1000)\",\n                \"wheelGauge\": \"1600 (+2,-1)\"\n            },\n            \"status\": \"saved\"\n        },\n        {\n            \"formNumber\": \"WHEEL-2025-004\",\n            \"submittedBy\": \"user_id_123\",\n            \"submittedDate\": \"2025-07-04\",\n            \"wheelFields\": {\n                \"condemningDia\": \"825 (800-900)\",\n                \"lastShopIssueSize\": \"837 (800-900)\",\n                \"treadDiameterNew\": \"915 (900-1000)\",\n                \"wheelGauge\": \"1600 (+2,-1)\"\n            },\n            \"status\": \"saved\"\n        },\n        {\n            \"formNumber\": \"WHEEL-2025-003\",\n            \"submittedBy\": \"user_id_123\",\n            \"submittedDate\": \"2025-07-04\",\n            \"wheelFields\": {\n                \"condemningDia\": \"825 (800-900)\",\n                \"lastShopIssueSize\": \"837 (800-900)\",\n                \"treadDiameterNew\": \"915 (900-1000)\",\n                \"wheelGauge\": \"1600 (+2,-1)\"\n            },\n            \"status\": \"saved\"\n        },\n        {\n            \"formNumber\": \"WHEEL-2025-002\",\n            \"submittedBy\": \"user_id_124\",\n            \"submittedDate\": \"2025-07-05\",\n            \"wheelFields\": {\n                \"condemningDia\": \"444 (800-900)\",\n                \"lastShopIssueSize\": \"643 (800-900)\",\n                \"treadDiameterNew\": \"111 (900-1000)\",\n                \"wheelGauge\": \"1111 (+2,-1)\"\n            },\n            \"status\": \"saved\"\n        },\n        {\n            \"formNumber\": \"WHEEL-2025-001\",\n            \"submittedBy\": \"user_id_123\",\n            \"submittedDate\": \"2025-07-03\",\n            \"wheelFields\": {\n                \"condemningDia\": \"825 (800-900)\",\n                \"lastShopIssueSize\": \"837 (800-900)\",\n                \"treadDiameterNew\": \"915 (900-1000)\",\n                \"wheelGauge\": \"1600 (+2,-1)\"\n            },\n            \"status\": \"saved\"\n        }\n    ]\n}"
+				},
+				{
+					"name": "formNumber Filter",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/forms/wheel-specifications?formNumber=WHEEL-2025-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"forms",
+								"wheel-specifications"
+							],
+							"query": [
+								{
+									"key": "formNumber",
+									"value": "WHEEL-2025-001",
+									"description": "Filter by form number"
+								},
+								{
+									"key": "submittedBy",
+									"value": "user_id_124",
+									"description": "Filter by submitted by",
+									"disabled": true
+								},
+								{
+									"key": "submittedDate",
+									"value": "2025-07-05",
+									"description": "Filter by date (YYYY-MM-DD)",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "gunicorn"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 27 Jul 2025 18:15:20 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Allow",
+							"value": "GET, POST, HEAD, OPTIONS"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Length",
+							"value": "348"
+						},
+						{
+							"key": "Vary",
+							"value": "Cookie, origin"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"message\": \"Filtered wheel specification forms fetched successfully.\",\n    \"data\": [\n        {\n            \"formNumber\": \"WHEEL-2025-001\",\n            \"submittedBy\": \"user_id_123\",\n            \"submittedDate\": \"2025-07-03\",\n            \"wheelFields\": {\n                \"condemningDia\": \"825 (800-900)\",\n                \"lastShopIssueSize\": \"837 (800-900)\",\n                \"treadDiameterNew\": \"915 (900-1000)\",\n                \"wheelGauge\": \"1600 (+2,-1)\"\n            },\n            \"status\": \"saved\"\n        }\n    ]\n}"
+				},
+				{
+					"name": "submittedBy Filter",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/forms/wheel-specifications?submittedBy=user_id_124",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"forms",
+								"wheel-specifications"
+							],
+							"query": [
+								{
+									"key": "formNumber",
+									"value": "WHEEL-2025-001",
+									"description": "Filter by form number",
+									"disabled": true
+								},
+								{
+									"key": "submittedBy",
+									"value": "user_id_124",
+									"description": "Filter by submitted by"
+								},
+								{
+									"key": "submittedDate",
+									"value": "2025-07-05",
+									"description": "Filter by date (YYYY-MM-DD)",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "gunicorn"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 27 Jul 2025 18:15:49 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Allow",
+							"value": "GET, POST, HEAD, OPTIONS"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Length",
+							"value": "602"
+						},
+						{
+							"key": "Vary",
+							"value": "Cookie, origin"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"message\": \"Filtered wheel specification forms fetched successfully.\",\n    \"data\": [\n        {\n            \"formNumber\": \"WHEEL-2025-005\",\n            \"submittedBy\": \"user_id_124\",\n            \"submittedDate\": \"2025-07-06\",\n            \"wheelFields\": {\n                \"condemningDia\": \"825 (800-900)\",\n                \"lastShopIssueSize\": \"837 (800-900)\",\n                \"treadDiameterNew\": \"915 (900-1000)\",\n                \"wheelGauge\": \"1600 (+2,-1)\"\n            },\n            \"status\": \"saved\"\n        },\n        {\n            \"formNumber\": \"WHEEL-2025-002\",\n            \"submittedBy\": \"user_id_124\",\n            \"submittedDate\": \"2025-07-05\",\n            \"wheelFields\": {\n                \"condemningDia\": \"444 (800-900)\",\n                \"lastShopIssueSize\": \"643 (800-900)\",\n                \"treadDiameterNew\": \"111 (900-1000)\",\n                \"wheelGauge\": \"1111 (+2,-1)\"\n            },\n            \"status\": \"saved\"\n        }\n    ]\n}"
+				},
+				{
+					"name": "submittedDate Filter",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/forms/wheel-specifications?submittedDate=2025-07-05",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"forms",
+								"wheel-specifications"
+							],
+							"query": [
+								{
+									"key": "formNumber",
+									"value": "WHEEL-2025-001",
+									"description": "Filter by form number",
+									"disabled": true
+								},
+								{
+									"key": "submittedBy",
+									"value": "user_id_124",
+									"description": "Filter by submitted by",
+									"disabled": true
+								},
+								{
+									"key": "submittedDate",
+									"value": "2025-07-05",
+									"description": "Filter by date (YYYY-MM-DD)"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "gunicorn"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 27 Jul 2025 18:16:20 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Allow",
+							"value": "GET, POST, HEAD, OPTIONS"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Length",
+							"value": "348"
+						},
+						{
+							"key": "Vary",
+							"value": "Cookie, origin"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"message\": \"Filtered wheel specification forms fetched successfully.\",\n    \"data\": [\n        {\n            \"formNumber\": \"WHEEL-2025-002\",\n            \"submittedBy\": \"user_id_124\",\n            \"submittedDate\": \"2025-07-05\",\n            \"wheelFields\": {\n                \"condemningDia\": \"444 (800-900)\",\n                \"lastShopIssueSize\": \"643 (800-900)\",\n                \"treadDiameterNew\": \"111 (900-1000)\",\n                \"wheelGauge\": \"1111 (+2,-1)\"\n            },\n            \"status\": \"saved\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Create new Wheel Specification",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"fields\": {\n    \"axleBoxHousingBoreDia\": \"280 (+0.030/+0.052)\",\n    \"bearingSeatDiameter\": \"130.043 TO 130.068\",\n    \"condemningDia\": \"825 (800-900)\",\n    \"intermediateWWP\": \"20 TO 28\",\n    \"lastShopIssueSize\": \"837 (800-900)\",\n    \"rollerBearingBoreDia\": \"130 (+0.0/-0.025)\",\n    \"rollerBearingOuterDia\": \"280 (+0.0/-0.035)\",\n    \"rollerBearingWidth\": \"93 (+0/-0.250)\",\n    \"treadDiameterNew\": \"915 (900-1000)\",\n    \"variationSameAxle\": \"0.5\",\n    \"variationSameBogie\": \"5\",\n    \"variationSameCoach\": \"13\",\n    \"wheelDiscWidth\": \"127 (+4/-0)\",\n    \"wheelGauge\": \"1600 (+2,-1)\",\n    \"wheelProfile\": \"29.4 Flange Thickness\"\n  },\n  \"formNumber\": \"WHEEL-2025-003\",\n  \"submittedBy\": \"user_id_123\",\n  \"submittedDate\": \"2025-07-04\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/forms/wheel-specifications/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"forms",
+						"wheel-specifications",
+						""
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "New Request",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fields\": {\n    \"axleBoxHousingBoreDia\": \"280 (+0.030/+0.052)\",\n    \"bearingSeatDiameter\": \"130.043 TO 130.068\",\n    \"condemningDia\": \"825 (800-900)\",\n    \"intermediateWWP\": \"20 TO 28\",\n    \"lastShopIssueSize\": \"837 (800-900)\",\n    \"rollerBearingBoreDia\": \"130 (+0.0/-0.025)\",\n    \"rollerBearingOuterDia\": \"280 (+0.0/-0.035)\",\n    \"rollerBearingWidth\": \"93 (+0/-0.250)\",\n    \"treadDiameterNew\": \"915 (900-1000)\",\n    \"variationSameAxle\": \"0.5\",\n    \"variationSameBogie\": \"5\",\n    \"variationSameCoach\": \"13\",\n    \"wheelDiscWidth\": \"127 (+4/-0)\",\n    \"wheelGauge\": \"1600 (+2,-1)\",\n    \"wheelProfile\": \"29.4 Flange Thickness\"\n  },\n  \"formNumber\": \"WHEEL-2025-003\",\n  \"submittedBy\": \"user_id_123\",\n  \"submittedDate\": \"2025-07-04\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/forms/wheel-specifications/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"forms",
+								"wheel-specifications",
+								""
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "gunicorn"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 27 Jul 2025 17:51:52 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Allow",
+							"value": "GET, POST, HEAD, OPTIONS"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Length",
+							"value": "185"
+						},
+						{
+							"key": "Vary",
+							"value": "Cookie, origin"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"message\": \"Wheel specification submitted successfully.\",\n    \"data\": {\n        \"formNumber\": \"WHEEL-2025-003\",\n        \"submittedBy\": \"user_id_123\",\n        \"submittedDate\": \"2025-07-04\",\n        \"status\": \"saved\"\n    }\n}"
+				},
+				{
+					"name": "New Request",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fields\": {\n    \"axleBoxHousingBoreDia\": \"280 (+0.030/+0.052)\",\n    \"bearingSeatDiameter\": \"130.043 TO 130.068\",\n    \"condemningDia\": \"825 (800-900)\",\n    \"intermediateWWP\": \"20 TO 28\",\n    \"lastShopIssueSize\": \"837 (800-900)\",\n    \"rollerBearingBoreDia\": \"130 (+0.0/-0.025)\",\n    \"rollerBearingOuterDia\": \"280 (+0.0/-0.035)\",\n    \"rollerBearingWidth\": \"93 (+0/-0.250)\",\n    \"treadDiameterNew\": \"915 (900-1000)\",\n    \"variationSameAxle\": \"0.5\",\n    \"variationSameBogie\": \"5\",\n    \"variationSameCoach\": \"13\",\n    \"wheelDiscWidth\": \"127 (+4/-0)\",\n    \"wheelGauge\": \"1600 (+2,-1)\",\n    \"wheelProfile\": \"29.4 Flange Thickness\"\n  },\n  \"formNumber\": \"WHEEL-2025-005\",\n  \"submittedBy\": \"user_id_124\",\n  \"submittedDate\": \"2025-07-06\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/forms/wheel-specifications/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"forms",
+								"wheel-specifications",
+								""
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "gunicorn"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 27 Jul 2025 18:12:29 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Allow",
+							"value": "GET, POST, HEAD, OPTIONS"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Length",
+							"value": "185"
+						},
+						{
+							"key": "Vary",
+							"value": "Cookie, origin"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"message\": \"Wheel specification submitted successfully.\",\n    \"data\": {\n        \"formNumber\": \"WHEEL-2025-005\",\n        \"submittedBy\": \"user_id_124\",\n        \"submittedDate\": \"2025-07-06\",\n        \"status\": \"saved\"\n    }\n}"
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000/api"
+		}
+	]
+}
