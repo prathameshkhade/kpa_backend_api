@@ -4,7 +4,7 @@ A Django REST Framework API for managing KPA wheel specification forms with filt
 
 ## 🚀 Tech Stack
 
-- **Backend Framework**: Django 4.2 + Django REST Framework
+- **Backend Framework**: Django 5.2 + Django REST Framework
 - **Database**: PostgreSQL 15
 - **API Documentation**: Swagger/OpenAPI (drf-spectacular)
 - **Environment Management**: python-dotenv
